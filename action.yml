@@ -1,0 +1,8 @@
+name: Template action
+description: Template action description
+
+inputs: { }
+
+runs:
+  using: node12
+  main: 'dist/index.js'
