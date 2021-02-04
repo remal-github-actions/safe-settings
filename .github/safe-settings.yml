@@ -1,0 +1,4 @@
+homePage:
+  showReleases: false
+  showPackages: false
+  showEnvironments: false
