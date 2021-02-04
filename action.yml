@@ -7,7 +7,7 @@ inputs:
     description: GitHub access token with at least 'public_repo' (use 'repo' scope instead of 'public_repo' for private repositories)
   settingsRef:
     required: false
-    description: Git branch or tag where settings file should be taken from
+    description: Git branch or tag where settings file should be taken from. Default branch is used by default.
 
 runs:
   using: node12
