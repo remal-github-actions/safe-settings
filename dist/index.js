@@ -134,9 +134,9 @@ function run() {
                     return null;
                 }
                 throw reason;
-            })))).filter(it => it != null);
+            })))).filter(it => it != null).map(it => it.data);
             for (const foundContent of foundContents) {
-                core.info(JSON.stringify(foundContent));
+                core.info(JSON.stringify(foundContent, null, 2));
             }
         }
         catch (error) {
