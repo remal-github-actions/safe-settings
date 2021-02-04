@@ -23,7 +23,7 @@ async function run(): Promise<void> {
                 repo: context.repo.repo,
                 path: configPath,
                 ref: settingsRef !== '' ? settingsRef : undefined,
-            }).catch(reason => typeof reason)
+            }).catch(reason => JSON.stringify(reason))
         ))
         for (const foundContent of foundContents) {
             core.info(JSON.stringify(foundContent))
