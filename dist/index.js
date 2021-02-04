@@ -30,9 +30,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.newOctokitInstance = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const utils_1 = __nccwpck_require__(3030);
+const plugin_request_log_1 = __nccwpck_require__(8883);
 const plugin_retry_1 = __nccwpck_require__(6298);
 const plugin_throttling_1 = __nccwpck_require__(9968);
-const plugin_request_log_1 = __nccwpck_require__(8883);
 const OctokitWithPlugins = utils_1.GitHub
     .plugin(plugin_retry_1.retry)
     .plugin(plugin_throttling_1.throttling)
@@ -111,8 +111,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const octokit_1 = __nccwpck_require__(8093);
 const github_1 = __nccwpck_require__(5438);
+const request_error_1 = __nccwpck_require__(537);
+const octokit_1 = __nccwpck_require__(8093);
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 const configPaths = ['json', 'json5', 'yaml', 'yml'].map(ext => `.github/safe-settings.${ext}`);
 const githubToken = core.getInput('githubToken', { required: true });
@@ -123,12 +124,17 @@ const octokit = octokit_1.newOctokitInstance(githubToken);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const foundContents = yield Promise.all(configPaths.map(configPath => octokit.repos.getContent({
+            const foundContents = (yield Promise.all(configPaths.map(configPath => octokit.repos.getContent({
                 owner: github_1.context.repo.owner,
                 repo: github_1.context.repo.repo,
                 path: configPath,
                 ref: settingsRef !== '' ? settingsRef : undefined,
-            }).catch(reason => typeof reason)));
+            }).catch(reason => {
+                if (reason instanceof request_error_1.RequestError && reason.status === 404) {
+                    return null;
+                }
+                throw reason;
+            })))).filter(it => it != null);
             for (const foundContent of foundContents) {
                 core.info(JSON.stringify(foundContent));
             }
