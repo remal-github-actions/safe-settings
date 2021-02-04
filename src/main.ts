@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
-import {newOctokitInstance} from './internal/octokit'
 import {context} from '@actions/github'
+import {RequestError} from '@octokit/request-error'
+import {newOctokitInstance} from './internal/octokit'
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -17,14 +18,21 @@ const octokit = newOctokitInstance(githubToken)
 
 async function run(): Promise<void> {
     try {
-        const foundContents = await Promise.all(configPaths.map(configPath =>
-            octokit.repos.getContent({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                path: configPath,
-                ref: settingsRef !== '' ? settingsRef : undefined,
-            }).catch(reason => JSON.stringify(reason))
-        ))
+        const foundContents = (
+            await Promise.all(configPaths.map(configPath =>
+                octokit.repos.getContent({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    path: configPath,
+                    ref: settingsRef !== '' ? settingsRef : undefined,
+                }).catch(reason => {
+                    if (reason instanceof RequestError && reason.status === 404) {
+                        return null
+                    }
+                    throw reason
+                })
+            ))
+        ).filter(it => it != null)
         for (const foundContent of foundContents) {
             core.info(JSON.stringify(foundContent))
         }
