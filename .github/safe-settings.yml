@@ -1,0 +1,11 @@
+wikis:
+  enabled: false
+
+projects:
+  enabled: false
+
+pullRequests:
+  mergeCommitsEnabled: false
+  squashMergingEnabled: true
+  rebaseMergingEnabled: false
+  autoMergeEnabled: true
