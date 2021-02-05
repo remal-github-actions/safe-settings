@@ -59,14 +59,19 @@ async function run(): Promise<void> {
         const config = parseConfig(foundFile)
         core.info(JSON.stringify(config, null, 2))
 
-        const ajv = new Ajv({useDefaults: true})
+        const ajv = new Ajv({
+            strict: true,
+            strictTypes: true,
+            strictTuples: true,
+            useDefaults: true,
+        })
         formatsPlugin(ajv)
         const schema = require('../config.schema.json')
         const validateConfig = ajv.compile(schema)
         if (!validateConfig(config)) {
             core.setFailed(
                 `Config validation failed: ${foundFile.download_url}:`
-                + `\n  ${validateConfig.errors?.join("\n  ")}`
+                + `\n  ${ajv.errorsText(validateConfig.errors, {separator: "\n  "})}`
             )
             return
         }
