@@ -108,12 +108,6 @@ export interface Projects {
  */
 export interface PullRequests {
     /**
-     * Automatically delete head branches.
-     *
-     * Deleted branches will still be able to be restored.
-     */
-    automaticBranchDeletionEnabled?: boolean;
-    /**
      * There is no API for this yet!
      *
      * Allow auto-merge.
@@ -121,6 +115,12 @@ export interface PullRequests {
      * Waits for merge requirements to be met and then merges automatically.
      */
     autoMergeEnabled?: boolean;
+    /**
+     * Automatically delete head branches.
+     *
+     * Deleted branches will still be able to be restored.
+     */
+    deleteBranchOnMergeEnabled?: boolean;
     /**
      * Allow merge commits.
      *

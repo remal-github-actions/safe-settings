@@ -9,3 +9,4 @@ pullRequests:
   squashMergingEnabled: true
   rebaseMergingEnabled: false
   autoMergeEnabled: true
+  deleteBranchOnMergeEnabled: false

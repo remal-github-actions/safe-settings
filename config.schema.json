@@ -106,7 +106,7 @@
           "x-intellij-html-description": "Allow auto-merge.<p>Waits for merge requirements to be met and then merges automatically.",
           "type": "boolean"
         },
-        "automaticBranchDeletionEnabled": {
+        "deleteBranchOnMergeEnabled": {
           "description": "Automatically delete head branches.\n\nDeleted branches will still be able to be restored.",
           "x-intellij-html-description": "Automatically delete head branches.<p>Deleted branches will still be able to be restored.",
           "type": "boolean"

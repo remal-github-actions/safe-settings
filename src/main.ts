@@ -63,7 +63,7 @@ async function run(): Promise<void> {
         const untypedConfig = parseConfig(foundFile)
         validateConfig(untypedConfig)
         const config = untypedConfig as Config
-        core.info(JSON.stringify(config, null, 2))
+        core.debug(JSON.stringify(config, null, 2))
 
 
         const repo = await octokit.repos.get({owner: context.repo.owner, repo: context.repo.repo}).then(it => it.data)
@@ -174,15 +174,15 @@ async function run(): Promise<void> {
                 }
                 repoPatch.allow_rebase_merge = pullRequests.rebaseMergingEnabled
             }
-            if (pullRequests.automaticBranchDeletionEnabled != null
-                && pullRequests.automaticBranchDeletionEnabled !== repo.delete_branch_on_merge
+            if (pullRequests.deleteBranchOnMergeEnabled != null
+                && pullRequests.deleteBranchOnMergeEnabled !== repo.delete_branch_on_merge
             ) {
-                if (pullRequests.automaticBranchDeletionEnabled) {
+                if (pullRequests.deleteBranchOnMergeEnabled) {
                     core.info('Enabling automatic branch deletion on merge')
                 } else {
                     core.info('Disabling automatic branch deletion on merge')
                 }
-                repoPatch.delete_branch_on_merge = pullRequests.automaticBranchDeletionEnabled
+                repoPatch.delete_branch_on_merge = pullRequests.deleteBranchOnMergeEnabled
             }
         }
         if (config.pullRequests != null) {
