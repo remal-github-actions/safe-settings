@@ -50,7 +50,7 @@ function run() {
 }
 //noinspection JSIgnoredPromiseFromCall
 run();
-//# sourceMappingURL=main.js.map
+
 
 /***/ }),
 
