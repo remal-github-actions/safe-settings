@@ -63,6 +63,7 @@ async function run(): Promise<void> {
         const untypedConfig = parseConfig(foundFile)
         validateConfig(untypedConfig)
         const config = untypedConfig as Config
+        core.info(JSON.stringify(config, null, 2))
 
 
         const repo = await octokit.repos.get({owner: context.repo.owner, repo: context.repo.repo}).then(it => it.data)
