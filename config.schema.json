@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JSON schema for safe-settings config file",
+  "type": "object",
+  "properties": {
+    "details": {
+      "description": "Repository details",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Description",
+          "type": "string"
+        },
+        "website": {
+          "description": "Website URL",
+          "type": "string",
+          "format": "uri"
+        },
+        "topics": {
+          "description": "Topics",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "homePage": {
+      "description": "Repository home page settings",
+      "type": "object",
+      "properties": {
+        "showReleases": {
+          "description": "Show releases",
+          "type": "boolean"
+        },
+        "showPackages": {
+          "description": "Show packages",
+          "type": "boolean"
+        },
+        "showEnvironments": {
+          "description": "Show environments",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

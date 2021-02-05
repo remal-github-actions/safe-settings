@@ -2,13 +2,15 @@ import * as core from '@actions/core'
 import {context} from '@actions/github'
 import {components} from '@octokit/openapi-types/generated/types'
 import {RequestError} from '@octokit/request-error'
+import Ajv from 'ajv'
+import formatsPlugin from 'ajv-formats'
 import jsyaml from 'js-yaml'
 import json5 from 'json5'
 import {newOctokitInstance} from './internal/octokit'
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-const configPaths = ['json', 'json5', 'yaml', 'yml'].map(ext => `.github/safe-settings.${ext}`)
+const configPaths = ['yml', 'yaml', 'json', 'json5',].map(ext => `.github/safe-settings.${ext}`)
 
 const githubToken = core.getInput('githubToken', {required: true})
 core.setSecret(githubToken)
@@ -46,6 +48,7 @@ async function run(): Promise<void> {
             }
         }
         if (foundFiles.length === 0) {
+            core.warning(`No config files found in the repository:\n  ${configPaths.join("\n  ")}`)
             return
         } else if (foundFiles.length > 1) {
             throw new Error(
@@ -55,6 +58,18 @@ async function run(): Promise<void> {
         const foundFile = foundFiles[0]
         const config = parseConfig(foundFile)
         core.info(JSON.stringify(config, null, 2))
+
+        const ajv = new Ajv({useDefaults: true})
+        formatsPlugin(ajv)
+        const schema = require('../config.schema.json')
+        const validateConfig = ajv.compile(schema)
+        if (!validateConfig(config)) {
+            core.setFailed(
+                `Config validation failed: ${foundFile.download_url}:`
+                + `\n  ${validateConfig.errors?.join("\n  ")}`
+            )
+            return
+        }
 
     } catch (error) {
         core.setFailed(error)
@@ -86,7 +101,7 @@ function getConfigParser(contentFile: ContentFile): ConfigParser {
 
 function parseConfig(contentFile: ContentFile): any | null {
     const parser = getConfigParser(contentFile)
-    const content = new Buffer(contentFile.content, 'base64').toString('utf-8')
+    const content = Buffer.from(contentFile.content, 'base64').toString('utf-8')
     try {
         return parser(content)
     } catch (e) {
