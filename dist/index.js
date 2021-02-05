@@ -6,7 +6,7 @@ module.exports =
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"title\":\"JSON schema for safe-settings config file\",\"type\":\"object\",\"properties\":{\"details\":{\"description\":\"Repository details\",\"type\":\"object\",\"properties\":{\"description\":{\"description\":\"Description\",\"type\":\"string\"},\"website\":{\"description\":\"Website URL\",\"type\":\"string\",\"format\":\"uri\"},\"topics\":{\"description\":\"Topics\",\"type\":\"array\",\"uniqueItems\":true,\"items\":{\"type\":\"string\",\"minLength\":1}}},\"additionalProperties\":false},\"homePage\":{\"description\":\"Repository home page settings\",\"type\":\"object\",\"properties\":{\"showReleases\":{\"description\":\"Show releases\",\"type\":\"boolean\"},\"showPackages\":{\"description\":\"Show packages\",\"type\":\"boolean\"},\"showEnvironments\":{\"description\":\"Show environments\",\"type\":\"boolean\"}},\"additionalProperties\":false}},\"additionalProperties\":false}");
+module.exports = JSON.parse("{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"title\":\"JSON schema for safe-settings config file\",\"type\":\"object\",\"properties\":{\"details\":{\"description\":\"Repository details\",\"type\":\"object\",\"properties\":{\"description\":{\"description\":\"Description\",\"type\":\"string\"},\"website\":{\"description\":\"Website URL\",\"type\":\"string\",\"format\":\"uri\"},\"topics\":{\"description\":\"Topics\",\"type\":\"array\",\"uniqueItems\":true,\"items\":{\"type\":\"string\",\"minLength\":1,\"pattern\":\"^\\\\S+$\"}}},\"additionalProperties\":false},\"wikis\":{\"description\":\"Wikis settings\",\"type\":\"object\",\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"},\"editingRestrictedToUsersWithPushAccessOnly\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nRestrict editing to users with push access only.\",\"x-intellij-html-description\":\"Restrict editing to users with push access only.\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"issues\":{\"description\":\"Issues settings\",\"type\":\"object\",\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"projects\":{\"description\":\"Projects settings\",\"type\":\"object\",\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"discussions\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nDiscussions settings.\",\"x-intellij-html-description\":\"Discussions settings.\",\"type\":\"object\",\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"pullRequests\":{\"description\":\"Pull requests settings\",\"type\":\"object\",\"properties\":{\"mergeCommitsEnabled\":{\"description\":\"Allow merge commits.\\n\\nAdd all commits from the head branch to the base branch with a merge commit.\",\"x-intellij-html-description\":\"Allow merge commits.<p>Add all commits from the head branch to the base branch with a merge commit.\",\"type\":\"boolean\"},\"squashMergingEnabled\":{\"description\":\"Allow squash merging.\\n\\nCombine all commits from the head branch into a single commit in the base branch.\",\"x-intellij-html-description\":\"Allow squash merging.<p>Combine all commits from the head branch into a single commit in the base branch.\",\"type\":\"boolean\"},\"rebaseMergingEnabled\":{\"description\":\"Allow rebase merging.\\n\\nAdd all commits from the head branch onto the base branch individually.\",\"x-intellij-html-description\":\"Allow rebase merging.<p>Add all commits from the head branch onto the base branch individually.\",\"type\":\"boolean\"},\"autoMergeEnabled\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nAllow auto-merge.\\n\\nWaits for merge requirements to be met and then merges automatically.\",\"x-intellij-html-description\":\"Allow auto-merge.<p>Waits for merge requirements to be met and then merges automatically.\",\"type\":\"boolean\"},\"automaticBranchDeletionEnabled\":{\"description\":\"Automatically delete head branches.\\n\\nDeleted branches will still be able to be restored.\",\"x-intellij-html-description\":\"Automatically delete head branches.<p>Deleted branches will still be able to be restored.\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"homePage\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nRepository homepage settings.\",\"x-intellij-html-description\":\"Repository homepage settings.\",\"type\":\"object\",\"properties\":{\"releasesDisplayed\":{\"description\":\"Display releases on homepage\",\"type\":\"boolean\"},\"packagesDisplayed\":{\"description\":\"Display packages on homepage\",\"type\":\"boolean\"},\"environmentsDisplayed\":{\"description\":\"Display environments on homepage\",\"type\":\"boolean\"}},\"additionalProperties\":false}},\"additionalProperties\":false}");
 
 /***/ }),
 
@@ -126,6 +126,7 @@ const github_1 = __nccwpck_require__(5438);
 const request_error_1 = __nccwpck_require__(537);
 const ajv_1 = __importDefault(__nccwpck_require__(2426));
 const ajv_formats_1 = __importDefault(__nccwpck_require__(567));
+const fast_equals_1 = __nccwpck_require__(3393);
 const js_yaml_1 = __importDefault(__nccwpck_require__(1917));
 const json5_1 = __importDefault(__nccwpck_require__(6904));
 const octokit_1 = __nccwpck_require__(8093);
@@ -137,7 +138,6 @@ const settingsRef = core.getInput('settingsRef');
 const octokit = octokit_1.newOctokitInstance(githubToken);
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 function run() {
-    var _a, _b, _c, _d, _e, _f;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const foundFiles = (yield Promise.all(configPaths.map(configPath => octokit.repos.getContent({
@@ -179,15 +179,118 @@ function run() {
                 owner: github_1.context.repo.owner,
                 repo: github_1.context.repo.repo,
             };
-            if (((_a = config.details) === null || _a === void 0 ? void 0 : _a.description) != null && ((_b = config.details) === null || _b === void 0 ? void 0 : _b.description) !== repo.description) {
-                core.info('Updating repository description');
-                repoPatch.description = (_c = config.details) === null || _c === void 0 ? void 0 : _c.description;
+            const repoPatchInitialJson = JSON.stringify(repoPatch);
+            const processDetails = (details) => __awaiter(this, void 0, void 0, function* () {
+                if (details.description != null && details.description !== repo.description) {
+                    core.info('Updating repository description');
+                    repoPatch.description = details.description;
+                }
+                if (details.website != null && details.website !== repo.homepage) {
+                    core.info('Updating repository website');
+                    repoPatch.homepage = details.website;
+                }
+                if (details.topics != null && !fast_equals_1.deepEqual(details.topics, repo.topics)) {
+                    core.info('Updating repository topics');
+                    yield octokit.repos.replaceAllTopics({
+                        owner: github_1.context.repo.owner,
+                        repo: github_1.context.repo.repo,
+                        names: details.topics,
+                    });
+                }
+            });
+            if (config.details != null) {
+                yield processDetails(config.details);
             }
-            if (((_d = config.details) === null || _d === void 0 ? void 0 : _d.website) != null && ((_e = config.details) === null || _e === void 0 ? void 0 : _e.website) !== repo.homepage) {
-                core.info('Updating repository website');
-                repoPatch.homepage = (_f = config.details) === null || _f === void 0 ? void 0 : _f.website;
+            const processWikis = (wikis) => __awaiter(this, void 0, void 0, function* () {
+                if (wikis.enabled != null && wikis.enabled !== repo.has_wiki) {
+                    if (wikis.enabled) {
+                        core.info('Enabling wikis');
+                    }
+                    else {
+                        core.info('Disabling wikis');
+                    }
+                    repoPatch.has_wiki = wikis.enabled;
+                }
+            });
+            if (config.wikis != null) {
+                yield processWikis(config.wikis);
             }
-            yield octokit.repos.update(repoPatch);
+            const processIssues = (issues) => __awaiter(this, void 0, void 0, function* () {
+                if (issues.enabled != null && issues.enabled !== repo.has_issues) {
+                    if (issues.enabled) {
+                        core.info('Enabling issues');
+                    }
+                    else {
+                        core.info('Disabling issues');
+                    }
+                    repoPatch.has_issues = issues.enabled;
+                }
+            });
+            if (config.issues != null) {
+                yield processIssues(config.issues);
+            }
+            const processProjects = (projects) => __awaiter(this, void 0, void 0, function* () {
+                if (projects.enabled != null && projects.enabled !== repo.has_projects) {
+                    if (projects.enabled) {
+                        core.info('Enabling projects');
+                    }
+                    else {
+                        core.info('Disabling projects');
+                    }
+                    repoPatch.has_projects = projects.enabled;
+                }
+            });
+            if (config.projects != null) {
+                yield processProjects(config.projects);
+            }
+            const processPullRequests = (pullRequests) => __awaiter(this, void 0, void 0, function* () {
+                if (pullRequests.mergeCommitsEnabled != null
+                    && pullRequests.mergeCommitsEnabled !== repo.allow_merge_commit) {
+                    if (pullRequests.mergeCommitsEnabled) {
+                        core.info('Enabling merge commits');
+                    }
+                    else {
+                        core.info('Disabling merge commits');
+                    }
+                    repoPatch.allow_merge_commit = pullRequests.mergeCommitsEnabled;
+                }
+                if (pullRequests.squashMergingEnabled != null
+                    && pullRequests.squashMergingEnabled !== repo.allow_squash_merge) {
+                    if (pullRequests.squashMergingEnabled) {
+                        core.info('Enabling squash merge');
+                    }
+                    else {
+                        core.info('Disabling squash merge');
+                    }
+                    repoPatch.allow_squash_merge = pullRequests.squashMergingEnabled;
+                }
+                if (pullRequests.rebaseMergingEnabled != null
+                    && pullRequests.rebaseMergingEnabled !== repo.allow_rebase_merge) {
+                    if (pullRequests.rebaseMergingEnabled) {
+                        core.info('Enabling rebase merge');
+                    }
+                    else {
+                        core.info('Disabling rebase merge');
+                    }
+                    repoPatch.allow_rebase_merge = pullRequests.rebaseMergingEnabled;
+                }
+                if (pullRequests.automaticBranchDeletionEnabled != null
+                    && pullRequests.automaticBranchDeletionEnabled !== repo.delete_branch_on_merge) {
+                    if (pullRequests.automaticBranchDeletionEnabled) {
+                        core.info('Enabling automatic branch deletion on merge');
+                    }
+                    else {
+                        core.info('Disabling automatic branch deletion on merge');
+                    }
+                    repoPatch.delete_branch_on_merge = pullRequests.automaticBranchDeletionEnabled;
+                }
+            });
+            if (config.pullRequests != null) {
+                yield processPullRequests(config.pullRequests);
+            }
+            if (repoPatchInitialJson !== JSON.stringify(repoPatch)) {
+                yield octokit.repos.update(repoPatch);
+            }
         }
         catch (error) {
             core.setFailed(error);
@@ -224,7 +327,7 @@ function parseConfig(contentFile) {
 }
 function validateConfig(config) {
     const ajv = new ajv_1.default({
-        strict: true,
+        strict: false,
         strictTypes: true,
         strictTuples: true,
         useDefaults: true,
@@ -13256,6 +13359,441 @@ module.exports = function equal(a, b) {
   // true if both NaN, false otherwise
   return a!==a && b!==b;
 };
+
+
+/***/ }),
+
+/***/ 3393:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+var HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+var keys = Object.keys;
+/**
+ * @function addToCache
+ *
+ * add object to cache if an object
+ *
+ * @param value the value to potentially add to cache
+ * @param cache the cache to add to
+ */
+function addToCache(value, cache) {
+    if (value && typeof value === 'object') {
+        cache.add(value);
+    }
+}
+/**
+ * @function hasPair
+ *
+ * @description
+ * does the `pairToMatch` exist in the list of `pairs` provided based on the
+ * `isEqual` check
+ *
+ * @param pairs the pairs to compare against
+ * @param pairToMatch the pair to match
+ * @param isEqual the equality comparator used
+ * @param meta the meta provided
+ * @returns does the pair exist in the pairs provided
+ */
+function hasPair(pairs, pairToMatch, isEqual, meta) {
+    var length = pairs.length;
+    var pair;
+    for (var index = 0; index < length; index++) {
+        pair = pairs[index];
+        if (isEqual(pair[0], pairToMatch[0], meta) &&
+            isEqual(pair[1], pairToMatch[1], meta)) {
+            return true;
+        }
+    }
+    return false;
+}
+/**
+ * @function hasValue
+ *
+ * @description
+ * does the `valueToMatch` exist in the list of `values` provided based on the
+ * `isEqual` check
+ *
+ * @param values the values to compare against
+ * @param valueToMatch the value to match
+ * @param isEqual the equality comparator used
+ * @param meta the meta provided
+ * @returns does the value exist in the values provided
+ */
+function hasValue(values, valueToMatch, isEqual, meta) {
+    var length = values.length;
+    for (var index = 0; index < length; index++) {
+        if (isEqual(values[index], valueToMatch, meta)) {
+            return true;
+        }
+    }
+    return false;
+}
+/**
+ * @function sameValueZeroEqual
+ *
+ * @description
+ * are the values passed strictly equal or both NaN
+ *
+ * @param a the value to compare against
+ * @param b the value to test
+ * @returns are the values equal by the SameValueZero principle
+ */
+function sameValueZeroEqual(a, b) {
+    return a === b || (a !== a && b !== b);
+}
+/**
+ * @function isPlainObject
+ *
+ * @description
+ * is the value a plain object
+ *
+ * @param value the value to test
+ * @returns is the value a plain object
+ */
+function isPlainObject(value) {
+    return value.constructor === Object || value.constructor == null;
+}
+/**
+ * @function isPromiseLike
+ *
+ * @description
+ * is the value promise-like (meaning it is thenable)
+ *
+ * @param value the value to test
+ * @returns is the value promise-like
+ */
+function isPromiseLike(value) {
+    return !!value && typeof value.then === 'function';
+}
+/**
+ * @function isReactElement
+ *
+ * @description
+ * is the value passed a react element
+ *
+ * @param value the value to test
+ * @returns is the value a react element
+ */
+function isReactElement(value) {
+    return !!(value && value.$$typeof);
+}
+/**
+ * @function getNewCacheFallback
+ *
+ * @description
+ * in cases where WeakSet is not supported, creates a new custom
+ * object that mimics the necessary API aspects for cache purposes
+ *
+ * @returns the new cache object
+ */
+function getNewCacheFallback() {
+    return Object.create({
+        _values: [],
+        add: function (value) {
+            this._values.push(value);
+        },
+        has: function (value) {
+            return this._values.indexOf(value) !== -1;
+        },
+    });
+}
+/**
+ * @function getNewCache
+ *
+ * @description
+ * get a new cache object to prevent circular references
+ *
+ * @returns the new cache object
+ */
+var getNewCache = (function (canUseWeakMap) {
+    if (canUseWeakMap) {
+        return function _getNewCache() {
+            return new WeakSet();
+        };
+    }
+    return getNewCacheFallback;
+})(HAS_WEAKSET_SUPPORT);
+/**
+ * @function createCircularEqualCreator
+ *
+ * @description
+ * create a custom isEqual handler specific to circular objects
+ *
+ * @param [isEqual] the isEqual comparator to use instead of isDeepEqual
+ * @returns the method to create the `isEqual` function
+ */
+function createCircularEqualCreator(isEqual) {
+    return function createCircularEqual(comparator) {
+        var _comparator = isEqual || comparator;
+        return function circularEqual(a, b, cache) {
+            if (cache === void 0) { cache = getNewCache(); }
+            var hasA = cache.has(a);
+            var hasB = cache.has(b);
+            if (hasA || hasB) {
+                return hasA && hasB;
+            }
+            addToCache(a, cache);
+            addToCache(b, cache);
+            return _comparator(a, b, cache);
+        };
+    };
+}
+/**
+ * @function toPairs
+ *
+ * @description
+ * convert the map passed into pairs (meaning an array of [key, value] tuples)
+ *
+ * @param map the map to convert to [key, value] pairs (entries)
+ * @returns the [key, value] pairs
+ */
+function toPairs(map) {
+    var pairs = new Array(map.size);
+    var index = 0;
+    map.forEach(function (value, key) {
+        pairs[index++] = [key, value];
+    });
+    return pairs;
+}
+/**
+ * @function toValues
+ *
+ * @description
+ * convert the set passed into values
+ *
+ * @param set the set to convert to values
+ * @returns the values
+ */
+function toValues(set) {
+    var values = new Array(set.size);
+    var index = 0;
+    set.forEach(function (value) {
+        values[index++] = value;
+    });
+    return values;
+}
+/**
+ * @function areArraysEqual
+ *
+ * @description
+ * are the arrays equal in value
+ *
+ * @param a the array to test
+ * @param b the array to test against
+ * @param isEqual the comparator to determine equality
+ * @param meta the meta object to pass through
+ * @returns are the arrays equal
+ */
+function areArraysEqual(a, b, isEqual, meta) {
+    var length = a.length;
+    if (b.length !== length) {
+        return false;
+    }
+    for (var index = 0; index < length; index++) {
+        if (!isEqual(a[index], b[index], meta)) {
+            return false;
+        }
+    }
+    return true;
+}
+/**
+ * @function areMapsEqual
+ *
+ * @description
+ * are the maps equal in value
+ *
+ * @param a the map to test
+ * @param b the map to test against
+ * @param isEqual the comparator to determine equality
+ * @param meta the meta map to pass through
+ * @returns are the maps equal
+ */
+function areMapsEqual(a, b, isEqual, meta) {
+    if (a.size !== b.size) {
+        return false;
+    }
+    var pairsA = toPairs(a);
+    var pairsB = toPairs(b);
+    var length = pairsA.length;
+    for (var index = 0; index < length; index++) {
+        if (!hasPair(pairsB, pairsA[index], isEqual, meta) ||
+            !hasPair(pairsA, pairsB[index], isEqual, meta)) {
+            return false;
+        }
+    }
+    return true;
+}
+var OWNER = '_owner';
+var hasOwnProperty = Function.prototype.bind.call(Function.prototype.call, Object.prototype.hasOwnProperty);
+/**
+ * @function areObjectsEqual
+ *
+ * @description
+ * are the objects equal in value
+ *
+ * @param a the object to test
+ * @param b the object to test against
+ * @param isEqual the comparator to determine equality
+ * @param meta the meta object to pass through
+ * @returns are the objects equal
+ */
+function areObjectsEqual(a, b, isEqual, meta) {
+    var keysA = keys(a);
+    var length = keysA.length;
+    if (keys(b).length !== length) {
+        return false;
+    }
+    var key;
+    for (var index = 0; index < length; index++) {
+        key = keysA[index];
+        if (!hasOwnProperty(b, key)) {
+            return false;
+        }
+        if (key === OWNER && isReactElement(a)) {
+            if (!isReactElement(b)) {
+                return false;
+            }
+        }
+        else if (!isEqual(a[key], b[key], meta)) {
+            return false;
+        }
+    }
+    return true;
+}
+/**
+ * @function areRegExpsEqual
+ *
+ * @description
+ * are the regExps equal in value
+ *
+ * @param a the regExp to test
+ * @param b the regExp to test agains
+ * @returns are the regExps equal
+ */
+function areRegExpsEqual(a, b) {
+    return (a.source === b.source &&
+        a.global === b.global &&
+        a.ignoreCase === b.ignoreCase &&
+        a.multiline === b.multiline &&
+        a.unicode === b.unicode &&
+        a.sticky === b.sticky &&
+        a.lastIndex === b.lastIndex);
+}
+/**
+ * @function areSetsEqual
+ *
+ * @description
+ * are the sets equal in value
+ *
+ * @param a the set to test
+ * @param b the set to test against
+ * @param isEqual the comparator to determine equality
+ * @param meta the meta set to pass through
+ * @returns are the sets equal
+ */
+function areSetsEqual(a, b, isEqual, meta) {
+    if (a.size !== b.size) {
+        return false;
+    }
+    var valuesA = toValues(a);
+    var valuesB = toValues(b);
+    var length = valuesA.length;
+    for (var index = 0; index < length; index++) {
+        if (!hasValue(valuesB, valuesA[index], isEqual, meta) ||
+            !hasValue(valuesA, valuesB[index], isEqual, meta)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+var isArray = Array.isArray;
+var HAS_MAP_SUPPORT = typeof Map === 'function';
+var HAS_SET_SUPPORT = typeof Set === 'function';
+var OBJECT_TYPEOF = 'object';
+function createComparator(createIsEqual) {
+    var isEqual = 
+    /* eslint-disable no-use-before-define */
+    typeof createIsEqual === 'function'
+        ? createIsEqual(comparator)
+        : comparator;
+    /* eslint-enable */
+    /**
+     * @function comparator
+     *
+     * @description
+     * compare the value of the two objects and return true if they are equivalent in values
+     *
+     * @param a the value to test against
+     * @param b the value to test
+     * @param [meta] an optional meta object that is passed through to all equality test calls
+     * @returns are a and b equivalent in value
+     */
+    function comparator(a, b, meta) {
+        if (sameValueZeroEqual(a, b)) {
+            return true;
+        }
+        if (a && b && typeof a === OBJECT_TYPEOF && typeof b === OBJECT_TYPEOF) {
+            if (isPlainObject(a) && isPlainObject(b)) {
+                return areObjectsEqual(a, b, isEqual, meta);
+            }
+            var arrayA = isArray(a);
+            var arrayB = isArray(b);
+            if (arrayA || arrayB) {
+                return arrayA === arrayB && areArraysEqual(a, b, isEqual, meta);
+            }
+            var aDate = a instanceof Date;
+            var bDate = b instanceof Date;
+            if (aDate || bDate) {
+                return aDate === bDate && sameValueZeroEqual(a.getTime(), b.getTime());
+            }
+            var aRegExp = a instanceof RegExp;
+            var bRegExp = b instanceof RegExp;
+            if (aRegExp || bRegExp) {
+                return aRegExp === bRegExp && areRegExpsEqual(a, b);
+            }
+            if (isPromiseLike(a) || isPromiseLike(b)) {
+                return a === b;
+            }
+            if (HAS_MAP_SUPPORT) {
+                var aMap = a instanceof Map;
+                var bMap = b instanceof Map;
+                if (aMap || bMap) {
+                    return aMap === bMap && areMapsEqual(a, b, isEqual, meta);
+                }
+            }
+            if (HAS_SET_SUPPORT) {
+                var aSet = a instanceof Set;
+                var bSet = b instanceof Set;
+                if (aSet || bSet) {
+                    return aSet === bSet && areSetsEqual(a, b, isEqual, meta);
+                }
+            }
+            return areObjectsEqual(a, b, isEqual, meta);
+        }
+        return false;
+    }
+    return comparator;
+}
+
+// comparator
+var deepEqual = createComparator();
+var shallowEqual = createComparator(function () { return sameValueZeroEqual; });
+var circularDeepEqual = createComparator(createCircularEqualCreator());
+var circularShallowEqual = createComparator(createCircularEqualCreator(sameValueZeroEqual));
+
+exports.circularDeepEqual = circularDeepEqual;
+exports.circularShallowEqual = circularShallowEqual;
+exports.createCustomEqual = createComparator;
+exports.deepEqual = deepEqual;
+exports.sameValueZeroEqual = sameValueZeroEqual;
+exports.shallowEqual = shallowEqual;
+//# sourceMappingURL=fast-equals.cjs.js.map
 
 
 /***/ }),
