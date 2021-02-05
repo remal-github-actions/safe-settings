@@ -174,6 +174,7 @@ function run() {
             const untypedConfig = parseConfig(foundFile);
             validateConfig(untypedConfig);
             const config = untypedConfig;
+            core.info(JSON.stringify(config, null, 2));
             const repo = yield octokit.repos.get({ owner: github_1.context.repo.owner, repo: github_1.context.repo.repo }).then(it => it.data);
             const repoPatch = {
                 owner: github_1.context.repo.owner,
