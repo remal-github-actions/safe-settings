@@ -8,7 +8,16 @@ import formatsPlugin from 'ajv-formats'
 import {deepEqual} from 'fast-equals'
 import jsyaml from 'js-yaml'
 import json5 from 'json5'
-import {Config, Details, Issues, Projects, PullRequests, Wikis} from './config.generated'
+import {
+    BranchProtection,
+    Config,
+    Details,
+    Issues,
+    Projects,
+    PullRequests,
+    SecurityAnalysis,
+    Wikis
+} from './config.generated'
 import {newOctokitInstance} from './internal/octokit'
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -32,12 +41,7 @@ async function run(): Promise<void> {
                 repo: context.repo.repo,
                 path: configPath,
                 ref: settingsRef !== '' ? settingsRef : undefined,
-            }).catch(reason => {
-                if (reason instanceof RequestError && reason.status === 404) {
-                    return null
-                }
-                throw reason
-            })
+            }).catch(valueOn404(null))
         )))
             .filter(it => it != null)
             .map(it => it!.data)
@@ -77,15 +81,15 @@ async function run(): Promise<void> {
 
         const processDetails = async (details: Details) => {
             if (details.description != null && details.description !== repo.description) {
-                core.info('Updating repository description')
+                core.warning('Updating repository description')
                 repoPatch.description = details.description
             }
             if (details.website != null && details.website !== repo.homepage) {
-                core.info('Updating repository website')
+                core.warning('Updating repository website')
                 repoPatch.homepage = details.website
             }
             if (details.topics != null && !deepEqual(details.topics, repo.topics)) {
-                core.info('Updating repository topics')
+                core.warning('Updating repository topics')
                 await octokit.repos.replaceAllTopics({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
@@ -101,9 +105,9 @@ async function run(): Promise<void> {
         const processWikis = async (wikis: Wikis) => {
             if (wikis.enabled != null && wikis.enabled !== repo.has_wiki) {
                 if (wikis.enabled) {
-                    core.info('Enabling wikis')
+                    core.warning('Enabling wikis')
                 } else {
-                    core.info('Disabling wikis')
+                    core.warning('Disabling wikis')
                 }
                 repoPatch.has_wiki = wikis.enabled
             }
@@ -116,9 +120,9 @@ async function run(): Promise<void> {
         const processIssues = async (issues: Issues) => {
             if (issues.enabled != null && issues.enabled !== repo.has_issues) {
                 if (issues.enabled) {
-                    core.info('Enabling issues')
+                    core.warning('Enabling issues')
                 } else {
-                    core.info('Disabling issues')
+                    core.warning('Disabling issues')
                 }
                 repoPatch.has_issues = issues.enabled
             }
@@ -131,9 +135,9 @@ async function run(): Promise<void> {
         const processProjects = async (projects: Projects) => {
             if (projects.enabled != null && projects.enabled !== repo.has_projects) {
                 if (projects.enabled) {
-                    core.info('Enabling projects')
+                    core.warning('Enabling projects')
                 } else {
-                    core.info('Disabling projects')
+                    core.warning('Disabling projects')
                 }
                 repoPatch.has_projects = projects.enabled
             }
@@ -148,9 +152,9 @@ async function run(): Promise<void> {
                 && pullRequests.mergeCommitsEnabled !== repo.allow_merge_commit
             ) {
                 if (pullRequests.mergeCommitsEnabled) {
-                    core.info('Enabling merge commits')
+                    core.warning('Enabling merge commits')
                 } else {
-                    core.info('Disabling merge commits')
+                    core.warning('Disabling merge commits')
                 }
                 repoPatch.allow_merge_commit = pullRequests.mergeCommitsEnabled
             }
@@ -158,9 +162,9 @@ async function run(): Promise<void> {
                 && pullRequests.squashMergingEnabled !== repo.allow_squash_merge
             ) {
                 if (pullRequests.squashMergingEnabled) {
-                    core.info('Enabling squash merge')
+                    core.warning('Enabling squash merge')
                 } else {
-                    core.info('Disabling squash merge')
+                    core.warning('Disabling squash merge')
                 }
                 repoPatch.allow_squash_merge = pullRequests.squashMergingEnabled
             }
@@ -168,9 +172,9 @@ async function run(): Promise<void> {
                 && pullRequests.rebaseMergingEnabled !== repo.allow_rebase_merge
             ) {
                 if (pullRequests.rebaseMergingEnabled) {
-                    core.info('Enabling rebase merge')
+                    core.warning('Enabling rebase merge')
                 } else {
-                    core.info('Disabling rebase merge')
+                    core.warning('Disabling rebase merge')
                 }
                 repoPatch.allow_rebase_merge = pullRequests.rebaseMergingEnabled
             }
@@ -178,15 +182,89 @@ async function run(): Promise<void> {
                 && pullRequests.deleteBranchOnMergeEnabled !== repo.delete_branch_on_merge
             ) {
                 if (pullRequests.deleteBranchOnMergeEnabled) {
-                    core.info('Enabling automatic branch deletion on merge')
+                    core.warning('Enabling automatic branch deletion on merge')
                 } else {
-                    core.info('Disabling automatic branch deletion on merge')
+                    core.warning('Disabling automatic branch deletion on merge')
                 }
                 repoPatch.delete_branch_on_merge = pullRequests.deleteBranchOnMergeEnabled
             }
         }
         if (config.pullRequests != null) {
             await processPullRequests(config.pullRequests)
+        }
+
+
+        const processSecurityAnalysis = async (securityAnalysis: SecurityAnalysis) => {
+            if (securityAnalysis.vulnerabilitiesAlertsEnabled != null) {
+                const enabled = await octokit.repos.checkVulnerabilityAlerts({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                }).then(() => true).catch(valueOn404(false))
+                if (securityAnalysis.vulnerabilitiesAlertsEnabled !== enabled) {
+                    if (securityAnalysis.vulnerabilitiesAlertsEnabled) {
+                        core.warning('Enabling Dependabot alerts')
+                        await octokit.repos.enableVulnerabilityAlerts({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                        })
+                    } else {
+                        core.warning('Disabling Dependabot alerts')
+                        await octokit.repos.disableVulnerabilityAlerts({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                        })
+                    }
+                }
+            }
+            if (securityAnalysis.automaticSecurityUpdatesEnabled != null) {
+                // TODO: Add check if enabled when a proper API method appears
+                const vulnerabilityAlertsEnabled = await octokit.repos.checkVulnerabilityAlerts({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                }).then(() => true).catch(valueOn404(false))
+                if (securityAnalysis.automaticSecurityUpdatesEnabled) {
+                    if (!vulnerabilityAlertsEnabled) {
+                        core.warning('Enabling Dependabot alerts')
+                        await octokit.repos.enableVulnerabilityAlerts({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                        })
+                    }
+                    core.warning('Enabling Dependabot security updates')
+                    await octokit.repos.enableAutomatedSecurityFixes({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                    })
+                } else if (vulnerabilityAlertsEnabled) {
+                    core.warning('Disabling Dependabot security updates')
+                    await octokit.repos.disableAutomatedSecurityFixes({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                    })
+                }
+            }
+        }
+        if (config.securityAnalysis != null) {
+            await processSecurityAnalysis(config.securityAnalysis)
+        }
+
+
+        const processBranchProtection = async (branchProtection: { [key: string]: BranchProtection }) => {
+            for (const [branchName, rules] of Object.entries(branchProtection)) {
+                core.info(branchName)
+            }
+        }
+        if (config.branchProtection != null && repo.default_branch in config.branchProtection) {
+            throw new Error(`branchProtection contains '${repo.default_branch}' branch, which is default branch for the repository. Use defaultBranchProtection instead.`)
+        }
+        if (config.defaultBranchProtection != null) {
+            if (config.branchProtection == null) {
+                config.branchProtection = {}
+            }
+            config.branchProtection[repo.default_branch] = config.defaultBranchProtection
+        }
+        if (config.branchProtection != null) {
+            await processBranchProtection(config.branchProtection)
         }
 
 
@@ -248,5 +326,14 @@ function validateConfig(config: unknown) {
             `Config validation failed:`
             + `\n  ${ajv.errorsText(validate.errors, {separator: '\n  '})}`
         )
+    }
+}
+
+function valueOn404<T>(value: T): (reason: any) => T {
+    return reason => {
+        if (reason instanceof RequestError && reason.status === 404) {
+            return value
+        }
+        throw reason
     }
 }

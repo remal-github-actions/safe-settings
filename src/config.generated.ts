@@ -1,5 +1,13 @@
 export interface Config {
     /**
+     * Branch protection rules
+     */
+    branchProtection?: { [key: string]: BranchProtection };
+    /**
+     * Default branch protection rules
+     */
+    defaultBranchProtection?: BranchProtection;
+    /**
      * Repository details
      */
     details?: Details;
@@ -28,9 +36,39 @@ export interface Config {
      */
     pullRequests?: PullRequests;
     /**
+     * Security & analysis features
+     */
+    securityAnalysis?: SecurityAnalysis;
+    /**
      * Wikis settings
      */
     wikis?: Wikis;
+}
+
+/**
+ * Branch protection rules
+ *
+ * Default branch protection rules
+ */
+export interface BranchProtection {
+    /**
+     * Include administrators.
+     *
+     * Enforce all configured restrictions for administrators.
+     */
+    administratorsIncluded?: boolean;
+    /**
+     * Allow deletions.
+     *
+     * Allow users with push access to delete matching branches.
+     */
+    deletionsAllowed?: boolean;
+    /**
+     * Allow force pushes.
+     *
+     * Permit force pushes for all users with push access.
+     */
+    forcePushesAllowed?: boolean;
 }
 
 /**
@@ -139,6 +177,26 @@ export interface PullRequests {
      * Combine all commits from the head branch into a single commit in the base branch.
      */
     squashMergingEnabled?: boolean;
+}
+
+/**
+ * Security & analysis features
+ */
+export interface SecurityAnalysis {
+    /**
+     * Dependabot security updates.
+     *
+     * Easily upgrade to non-vulnerable dependencies.
+     *
+     * Enabling these updates automatically enables Dependabot alerts.
+     */
+    automaticSecurityUpdatesEnabled?: boolean;
+    /**
+     * Dependabot alerts.
+     *
+     * Receive alerts of new vulnerabilities that affect your dependencies.
+     */
+    vulnerabilitiesAlertsEnabled?: boolean;
 }
 
 /**

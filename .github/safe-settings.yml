@@ -9,4 +9,8 @@ pullRequests:
   squashMergingEnabled: true
   rebaseMergingEnabled: false
   autoMergeEnabled: true
-  deleteBranchOnMergeEnabled: false
+  deleteBranchOnMergeEnabled: true
+
+defaultBranchProtection:
+  administratorsIncluded: true
+  forcePushesAllowed: false
