@@ -7,8 +7,9 @@
   },
   "main": "dist/main.js",
   "scripts": {
+    "generate-config-types": "quicktype -s schema --src config.schema.json -o src/config.generated.ts -t Config --just-types",
     "lint": "eslint --fix src/**/*.[jt]s",
-    "compile": "npm run lint && rimraf build && tsc --rootDir src --outDir build",
+    "compile": "npm run generate-config-types && npm run lint && rimraf build && tsc --rootDir src --outDir build",
     "dist": "npm run compile && rimraf dist && ncc build build/main.js --out dist",
     "build": "npm run dist"
   },
@@ -21,6 +22,7 @@
     "@types/js-yaml": "4.0.0",
     "ajv": "7.0.4",
     "ajv-formats": "1.5.1",
+    "fast-equals": "2.0.0",
     "js-yaml": "4.0.0",
     "json5": "2.2.0"
   },
@@ -31,6 +33,7 @@
     "eslint": "7.19.0",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-github": "4.1.1",
+    "quicktype": "15.0.258",
     "rimraf": "3.0.2",
     "typescript": "4.1.3"
   }

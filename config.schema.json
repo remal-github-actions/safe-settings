@@ -22,26 +22,114 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^\\S+$"
           }
         }
       },
       "additionalProperties": false
     },
-    "homePage": {
-      "description": "Repository home page settings",
+    "wikis": {
+      "description": "Wikis settings",
       "type": "object",
       "properties": {
-        "showReleases": {
-          "description": "Show releases",
+        "enabled": {
+          "description": "Enabled",
           "type": "boolean"
         },
-        "showPackages": {
-          "description": "Show packages",
+        "editingRestrictedToUsersWithPushAccessOnly": {
+          "deprecationMessage": "There is no API for this yet",
+          "description": "There is no API for this yet!\n\nRestrict editing to users with push access only.",
+          "x-intellij-html-description": "Restrict editing to users with push access only.",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "issues": {
+      "description": "Issues settings",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enabled",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "projects": {
+      "description": "Projects settings",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enabled",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "discussions": {
+      "deprecationMessage": "There is no API for this yet",
+      "description": "There is no API for this yet!\n\nDiscussions settings.",
+      "x-intellij-html-description": "Discussions settings.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enabled",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "pullRequests": {
+      "description": "Pull requests settings",
+      "type": "object",
+      "properties": {
+        "mergeCommitsEnabled": {
+          "description": "Allow merge commits.\n\nAdd all commits from the head branch to the base branch with a merge commit.",
+          "x-intellij-html-description": "Allow merge commits.<p>Add all commits from the head branch to the base branch with a merge commit.",
           "type": "boolean"
         },
-        "showEnvironments": {
-          "description": "Show environments",
+        "squashMergingEnabled": {
+          "description": "Allow squash merging.\n\nCombine all commits from the head branch into a single commit in the base branch.",
+          "x-intellij-html-description": "Allow squash merging.<p>Combine all commits from the head branch into a single commit in the base branch.",
+          "type": "boolean"
+        },
+        "rebaseMergingEnabled": {
+          "description": "Allow rebase merging.\n\nAdd all commits from the head branch onto the base branch individually.",
+          "x-intellij-html-description": "Allow rebase merging.<p>Add all commits from the head branch onto the base branch individually.",
+          "type": "boolean"
+        },
+        "autoMergeEnabled": {
+          "deprecationMessage": "There is no API for this yet",
+          "description": "There is no API for this yet!\n\nAllow auto-merge.\n\nWaits for merge requirements to be met and then merges automatically.",
+          "x-intellij-html-description": "Allow auto-merge.<p>Waits for merge requirements to be met and then merges automatically.",
+          "type": "boolean"
+        },
+        "automaticBranchDeletionEnabled": {
+          "description": "Automatically delete head branches.\n\nDeleted branches will still be able to be restored.",
+          "x-intellij-html-description": "Automatically delete head branches.<p>Deleted branches will still be able to be restored.",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "homePage": {
+      "deprecationMessage": "There is no API for this yet",
+      "description": "There is no API for this yet!\n\nRepository homepage settings.",
+      "x-intellij-html-description": "Repository homepage settings.",
+      "type": "object",
+      "properties": {
+        "releasesDisplayed": {
+          "description": "Display releases on homepage",
+          "type": "boolean"
+        },
+        "packagesDisplayed": {
+          "description": "Display packages on homepage",
+          "type": "boolean"
+        },
+        "environmentsDisplayed": {
+          "description": "Display environments on homepage",
           "type": "boolean"
         }
       },
