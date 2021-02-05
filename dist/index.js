@@ -6,7 +6,7 @@ module.exports =
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"title\":\"JSON schema for safe-settings config file\",\"type\":\"object\",\"properties\":{\"details\":{\"description\":\"Repository details\",\"type\":\"object\",\"properties\":{\"description\":{\"description\":\"Description\",\"type\":\"string\"},\"website\":{\"description\":\"Website URL\",\"type\":\"string\",\"format\":\"uri\"},\"topics\":{\"description\":\"Topics\",\"type\":\"array\",\"uniqueItems\":true,\"items\":{\"type\":\"string\",\"minLength\":1,\"pattern\":\"^\\\\S+$\"}}},\"additionalProperties\":false},\"wikis\":{\"description\":\"Wikis settings\",\"type\":\"object\",\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"},\"editingRestrictedToUsersWithPushAccessOnly\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nRestrict editing to users with push access only.\",\"x-intellij-html-description\":\"Restrict editing to users with push access only.\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"issues\":{\"description\":\"Issues settings\",\"type\":\"object\",\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"projects\":{\"description\":\"Projects settings\",\"type\":\"object\",\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"discussions\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nDiscussions settings.\",\"x-intellij-html-description\":\"Discussions settings.\",\"type\":\"object\",\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"pullRequests\":{\"description\":\"Pull requests settings\",\"type\":\"object\",\"properties\":{\"mergeCommitsEnabled\":{\"description\":\"Allow merge commits.\\n\\nAdd all commits from the head branch to the base branch with a merge commit.\",\"x-intellij-html-description\":\"Allow merge commits.<p>Add all commits from the head branch to the base branch with a merge commit.\",\"type\":\"boolean\"},\"squashMergingEnabled\":{\"description\":\"Allow squash merging.\\n\\nCombine all commits from the head branch into a single commit in the base branch.\",\"x-intellij-html-description\":\"Allow squash merging.<p>Combine all commits from the head branch into a single commit in the base branch.\",\"type\":\"boolean\"},\"rebaseMergingEnabled\":{\"description\":\"Allow rebase merging.\\n\\nAdd all commits from the head branch onto the base branch individually.\",\"x-intellij-html-description\":\"Allow rebase merging.<p>Add all commits from the head branch onto the base branch individually.\",\"type\":\"boolean\"},\"autoMergeEnabled\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nAllow auto-merge.\\n\\nWaits for merge requirements to be met and then merges automatically.\",\"x-intellij-html-description\":\"Allow auto-merge.<p>Waits for merge requirements to be met and then merges automatically.\",\"type\":\"boolean\"},\"deleteBranchOnMergeEnabled\":{\"description\":\"Automatically delete head branches.\\n\\nDeleted branches will still be able to be restored.\",\"x-intellij-html-description\":\"Automatically delete head branches.<p>Deleted branches will still be able to be restored.\",\"type\":\"boolean\"}},\"additionalProperties\":false},\"homePage\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nRepository homepage settings.\",\"x-intellij-html-description\":\"Repository homepage settings.\",\"type\":\"object\",\"properties\":{\"releasesDisplayed\":{\"description\":\"Display releases on homepage\",\"type\":\"boolean\"},\"packagesDisplayed\":{\"description\":\"Display packages on homepage\",\"type\":\"boolean\"},\"environmentsDisplayed\":{\"description\":\"Display environments on homepage\",\"type\":\"boolean\"}},\"additionalProperties\":false}},\"additionalProperties\":false}");
+module.exports = JSON.parse("{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"title\":\"JSON schema for safe-settings config file\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"details\":{\"description\":\"Repository details\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"description\":{\"description\":\"Description\",\"type\":\"string\"},\"website\":{\"description\":\"Website URL\",\"type\":\"string\",\"format\":\"uri\"},\"topics\":{\"description\":\"Topics\",\"type\":\"array\",\"uniqueItems\":true,\"items\":{\"type\":\"string\",\"minLength\":1,\"pattern\":\"^\\\\S+$\"}}}},\"wikis\":{\"description\":\"Wikis settings\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"},\"editingRestrictedToUsersWithPushAccessOnly\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nRestrict editing to users with push access only.\",\"x-intellij-html-description\":\"Restrict editing to users with push access only.\",\"type\":\"boolean\"}}},\"issues\":{\"description\":\"Issues settings\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}}},\"projects\":{\"description\":\"Projects settings\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}}},\"discussions\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nDiscussions settings.\",\"x-intellij-html-description\":\"Discussions settings.\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"enabled\":{\"description\":\"Enabled\",\"type\":\"boolean\"}}},\"pullRequests\":{\"description\":\"Pull requests settings\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"mergeCommitsEnabled\":{\"description\":\"Allow merge commits.\\n\\nAdd all commits from the head branch to the base branch with a merge commit.\",\"x-intellij-html-description\":\"Allow merge commits.<p>Add all commits from the head branch to the base branch with a merge commit.\",\"type\":\"boolean\"},\"squashMergingEnabled\":{\"description\":\"Allow squash merging.\\n\\nCombine all commits from the head branch into a single commit in the base branch.\",\"x-intellij-html-description\":\"Allow squash merging.<p>Combine all commits from the head branch into a single commit in the base branch.\",\"type\":\"boolean\"},\"rebaseMergingEnabled\":{\"description\":\"Allow rebase merging.\\n\\nAdd all commits from the head branch onto the base branch individually.\",\"x-intellij-html-description\":\"Allow rebase merging.<p>Add all commits from the head branch onto the base branch individually.\",\"type\":\"boolean\"},\"autoMergeEnabled\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nAllow auto-merge.\\n\\nWaits for merge requirements to be met and then merges automatically.\",\"x-intellij-html-description\":\"Allow auto-merge.<p>Waits for merge requirements to be met and then merges automatically.\",\"type\":\"boolean\"},\"deleteBranchOnMergeEnabled\":{\"description\":\"Automatically delete head branches.\\n\\nDeleted branches will still be able to be restored.\",\"x-intellij-html-description\":\"Automatically delete head branches.<p>Deleted branches will still be able to be restored.\",\"type\":\"boolean\"}}},\"securityAnalysis\":{\"description\":\"Security & analysis features\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"vulnerabilitiesAlertsEnabled\":{\"description\":\"Dependabot alerts.\\n\\nReceive alerts of new vulnerabilities that affect your dependencies.\",\"type\":\"boolean\"},\"automaticSecurityUpdatesEnabled\":{\"description\":\"Dependabot security updates.\\n\\nEasily upgrade to non-vulnerable dependencies.\\n\\nEnabling these updates automatically enables Dependabot alerts.\",\"type\":\"boolean\"}}},\"defaultBranchProtection\":{\"description\":\"Default branch protection rules\",\"$ref\":\"#/definitions/BranchProtection\"},\"branchProtection\":{\"description\":\"Branch protection rules\",\"type\":\"object\",\"additionalProperties\":{\"$ref\":\"#/definitions/BranchProtection\"}},\"homePage\":{\"deprecationMessage\":\"There is no API for this yet\",\"description\":\"There is no API for this yet!\\n\\nRepository homepage settings.\",\"x-intellij-html-description\":\"Repository homepage settings.\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"releasesDisplayed\":{\"description\":\"Display releases on homepage\",\"type\":\"boolean\"},\"packagesDisplayed\":{\"description\":\"Display packages on homepage\",\"type\":\"boolean\"},\"environmentsDisplayed\":{\"description\":\"Display environments on homepage\",\"type\":\"boolean\"}}}},\"definitions\":{\"BranchProtection\":{\"description\":\"Branch protection rules\",\"type\":\"object\",\"additionalProperties\":false,\"properties\":{\"administratorsIncluded\":{\"description\":\"Include administrators.\\n\\nEnforce all configured restrictions for administrators.\",\"x-intellij-html-description\":\"Include administrators.<p>Enforce all configured restrictions for administrators.\",\"type\":\"boolean\"},\"forcePushesAllowed\":{\"description\":\"Allow force pushes.\\n\\nPermit force pushes for all users with push access.\",\"x-intellij-html-description\":\"Allow force pushes.<p>Permit force pushes for all users with push access.\",\"type\":\"boolean\"},\"deletionsAllowed\":{\"description\":\"Allow deletions.\\n\\nAllow users with push access to delete matching branches.\",\"x-intellij-html-description\":\"Allow deletions.<p>Allow users with push access to delete matching branches.\",\"type\":\"boolean\"}}}}}");
 
 /***/ }),
 
@@ -145,12 +145,7 @@ function run() {
                 repo: github_1.context.repo.repo,
                 path: configPath,
                 ref: settingsRef !== '' ? settingsRef : undefined,
-            }).catch(reason => {
-                if (reason instanceof request_error_1.RequestError && reason.status === 404) {
-                    return null;
-                }
-                throw reason;
-            }))))
+            }).catch(valueOn404(null)))))
                 .filter(it => it != null)
                 .map(it => it.data)
                 .map(it => it);
@@ -183,15 +178,15 @@ function run() {
             const repoPatchInitialJson = JSON.stringify(repoPatch);
             const processDetails = (details) => __awaiter(this, void 0, void 0, function* () {
                 if (details.description != null && details.description !== repo.description) {
-                    core.info('Updating repository description');
+                    core.warning('Updating repository description');
                     repoPatch.description = details.description;
                 }
                 if (details.website != null && details.website !== repo.homepage) {
-                    core.info('Updating repository website');
+                    core.warning('Updating repository website');
                     repoPatch.homepage = details.website;
                 }
                 if (details.topics != null && !fast_equals_1.deepEqual(details.topics, repo.topics)) {
-                    core.info('Updating repository topics');
+                    core.warning('Updating repository topics');
                     yield octokit.repos.replaceAllTopics({
                         owner: github_1.context.repo.owner,
                         repo: github_1.context.repo.repo,
@@ -205,10 +200,10 @@ function run() {
             const processWikis = (wikis) => __awaiter(this, void 0, void 0, function* () {
                 if (wikis.enabled != null && wikis.enabled !== repo.has_wiki) {
                     if (wikis.enabled) {
-                        core.info('Enabling wikis');
+                        core.warning('Enabling wikis');
                     }
                     else {
-                        core.info('Disabling wikis');
+                        core.warning('Disabling wikis');
                     }
                     repoPatch.has_wiki = wikis.enabled;
                 }
@@ -219,10 +214,10 @@ function run() {
             const processIssues = (issues) => __awaiter(this, void 0, void 0, function* () {
                 if (issues.enabled != null && issues.enabled !== repo.has_issues) {
                     if (issues.enabled) {
-                        core.info('Enabling issues');
+                        core.warning('Enabling issues');
                     }
                     else {
-                        core.info('Disabling issues');
+                        core.warning('Disabling issues');
                     }
                     repoPatch.has_issues = issues.enabled;
                 }
@@ -233,10 +228,10 @@ function run() {
             const processProjects = (projects) => __awaiter(this, void 0, void 0, function* () {
                 if (projects.enabled != null && projects.enabled !== repo.has_projects) {
                     if (projects.enabled) {
-                        core.info('Enabling projects');
+                        core.warning('Enabling projects');
                     }
                     else {
-                        core.info('Disabling projects');
+                        core.warning('Disabling projects');
                     }
                     repoPatch.has_projects = projects.enabled;
                 }
@@ -248,46 +243,118 @@ function run() {
                 if (pullRequests.mergeCommitsEnabled != null
                     && pullRequests.mergeCommitsEnabled !== repo.allow_merge_commit) {
                     if (pullRequests.mergeCommitsEnabled) {
-                        core.info('Enabling merge commits');
+                        core.warning('Enabling merge commits');
                     }
                     else {
-                        core.info('Disabling merge commits');
+                        core.warning('Disabling merge commits');
                     }
                     repoPatch.allow_merge_commit = pullRequests.mergeCommitsEnabled;
                 }
                 if (pullRequests.squashMergingEnabled != null
                     && pullRequests.squashMergingEnabled !== repo.allow_squash_merge) {
                     if (pullRequests.squashMergingEnabled) {
-                        core.info('Enabling squash merge');
+                        core.warning('Enabling squash merge');
                     }
                     else {
-                        core.info('Disabling squash merge');
+                        core.warning('Disabling squash merge');
                     }
                     repoPatch.allow_squash_merge = pullRequests.squashMergingEnabled;
                 }
                 if (pullRequests.rebaseMergingEnabled != null
                     && pullRequests.rebaseMergingEnabled !== repo.allow_rebase_merge) {
                     if (pullRequests.rebaseMergingEnabled) {
-                        core.info('Enabling rebase merge');
+                        core.warning('Enabling rebase merge');
                     }
                     else {
-                        core.info('Disabling rebase merge');
+                        core.warning('Disabling rebase merge');
                     }
                     repoPatch.allow_rebase_merge = pullRequests.rebaseMergingEnabled;
                 }
                 if (pullRequests.deleteBranchOnMergeEnabled != null
                     && pullRequests.deleteBranchOnMergeEnabled !== repo.delete_branch_on_merge) {
                     if (pullRequests.deleteBranchOnMergeEnabled) {
-                        core.info('Enabling automatic branch deletion on merge');
+                        core.warning('Enabling automatic branch deletion on merge');
                     }
                     else {
-                        core.info('Disabling automatic branch deletion on merge');
+                        core.warning('Disabling automatic branch deletion on merge');
                     }
                     repoPatch.delete_branch_on_merge = pullRequests.deleteBranchOnMergeEnabled;
                 }
             });
             if (config.pullRequests != null) {
                 yield processPullRequests(config.pullRequests);
+            }
+            const processSecurityAnalysis = (securityAnalysis) => __awaiter(this, void 0, void 0, function* () {
+                if (securityAnalysis.vulnerabilitiesAlertsEnabled != null) {
+                    const enabled = yield octokit.repos.checkVulnerabilityAlerts({
+                        owner: github_1.context.repo.owner,
+                        repo: github_1.context.repo.repo,
+                    }).then(() => true).catch(valueOn404(false));
+                    if (securityAnalysis.vulnerabilitiesAlertsEnabled !== enabled) {
+                        if (securityAnalysis.vulnerabilitiesAlertsEnabled) {
+                            core.warning('Enabling Dependabot alerts');
+                            yield octokit.repos.enableVulnerabilityAlerts({
+                                owner: github_1.context.repo.owner,
+                                repo: github_1.context.repo.repo,
+                            });
+                        }
+                        else {
+                            core.warning('Disabling Dependabot alerts');
+                            yield octokit.repos.disableVulnerabilityAlerts({
+                                owner: github_1.context.repo.owner,
+                                repo: github_1.context.repo.repo,
+                            });
+                        }
+                    }
+                }
+                if (securityAnalysis.automaticSecurityUpdatesEnabled != null) {
+                    // TODO: Add check if enabled when a proper API method appears
+                    const vulnerabilityAlertsEnabled = yield octokit.repos.checkVulnerabilityAlerts({
+                        owner: github_1.context.repo.owner,
+                        repo: github_1.context.repo.repo,
+                    }).then(() => true).catch(valueOn404(false));
+                    if (securityAnalysis.automaticSecurityUpdatesEnabled) {
+                        if (!vulnerabilityAlertsEnabled) {
+                            core.warning('Enabling Dependabot alerts');
+                            yield octokit.repos.enableVulnerabilityAlerts({
+                                owner: github_1.context.repo.owner,
+                                repo: github_1.context.repo.repo,
+                            });
+                        }
+                        core.warning('Enabling Dependabot security updates');
+                        yield octokit.repos.enableAutomatedSecurityFixes({
+                            owner: github_1.context.repo.owner,
+                            repo: github_1.context.repo.repo,
+                        });
+                    }
+                    else if (vulnerabilityAlertsEnabled) {
+                        core.warning('Disabling Dependabot security updates');
+                        yield octokit.repos.disableAutomatedSecurityFixes({
+                            owner: github_1.context.repo.owner,
+                            repo: github_1.context.repo.repo,
+                        });
+                    }
+                }
+            });
+            if (config.securityAnalysis != null) {
+                yield processSecurityAnalysis(config.securityAnalysis);
+            }
+            const processBranchProtection = (branchProtection) => __awaiter(this, void 0, void 0, function* () {
+                for (const [branchName, rules] of Object.entries(branchProtection)) {
+                    core.info(branchName);
+                }
+            });
+            if (config.branchProtection != null && repo.default_branch in config.branchProtection) {
+                throw new Error(`branchProtection contains '${repo.default_branch}' branch, which is default branch for the repository. Use defaultBranchProtection instead.`);
+            }
+            if (config.defaultBranchProtection != null) {
+                if (config.branchProtection == null) {
+                    config.branchProtection = {};
+                }
+                config.branchProtection[repo.default_branch] = config.defaultBranchProtection;
+            }
+            if (config.branchProtection != null) {
+                yield processBranchProtection(config.branchProtection);
             }
             if (repoPatchInitialJson !== JSON.stringify(repoPatch)) {
                 yield octokit.repos.update(repoPatch);
@@ -340,6 +407,14 @@ function validateConfig(config) {
         throw new Error(`Config validation failed:`
             + `\n  ${ajv.errorsText(validate.errors, { separator: '\n  ' })}`);
     }
+}
+function valueOn404(value) {
+    return reason => {
+        if (reason instanceof request_error_1.RequestError && reason.status === 404) {
+            return value;
+        }
+        throw reason;
+    };
 }
 
 
