@@ -232,7 +232,7 @@ function parseConfig(contentFile: ContentFile): unknown {
 
 function validateConfig(config: unknown) {
     const ajv = new Ajv({
-        strict: true,
+        strict: false,
         strictTypes: true,
         strictTuples: true,
         useDefaults: true,
