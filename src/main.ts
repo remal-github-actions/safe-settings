@@ -62,6 +62,7 @@ async function run(): Promise<void> {
                 `${foundFiles.length} config files found:\n  ${foundFiles.map(it => it.path).join('\n  ')}`
             )
         }
+
         const foundFile = foundFiles[0]
         core.info(`Using config: ${foundFile.download_url}`)
         const untypedConfig = parseConfig(foundFile)
