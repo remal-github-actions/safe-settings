@@ -1,2 +1,2 @@
-# template-typescript
-Template repository for GitHub typescript actions
+# safe-settings
+Set project settings from .github/safe-settings.yml file
