@@ -2,10 +2,12 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "JSON schema for safe-settings config file",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "details": {
       "description": "Repository details",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "description": {
           "description": "Description",
@@ -26,12 +28,12 @@
             "pattern": "^\\S+$"
           }
         }
-      },
-      "additionalProperties": false
+      }
     },
     "wikis": {
       "description": "Wikis settings",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "enabled": {
           "description": "Enabled",
@@ -43,47 +45,47 @@
           "x-intellij-html-description": "Restrict editing to users with push access only.",
           "type": "boolean"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "issues": {
       "description": "Issues settings",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "enabled": {
           "description": "Enabled",
           "type": "boolean"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "projects": {
       "description": "Projects settings",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "enabled": {
           "description": "Enabled",
           "type": "boolean"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "discussions": {
       "deprecationMessage": "There is no API for this yet",
       "description": "There is no API for this yet!\n\nDiscussions settings.",
       "x-intellij-html-description": "Discussions settings.",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "enabled": {
           "description": "Enabled",
           "type": "boolean"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "pullRequests": {
       "description": "Pull requests settings",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "mergeCommitsEnabled": {
           "description": "Allow merge commits.\n\nAdd all commits from the head branch to the base branch with a merge commit.",
@@ -106,19 +108,45 @@
           "x-intellij-html-description": "Allow auto-merge.<p>Waits for merge requirements to be met and then merges automatically.",
           "type": "boolean"
         },
-        "automaticBranchDeletionEnabled": {
+        "deleteBranchOnMergeEnabled": {
           "description": "Automatically delete head branches.\n\nDeleted branches will still be able to be restored.",
           "x-intellij-html-description": "Automatically delete head branches.<p>Deleted branches will still be able to be restored.",
           "type": "boolean"
         }
-      },
-      "additionalProperties": false
+      }
+    },
+    "securityAnalysis": {
+      "description": "Security & analysis features",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vulnerabilitiesAlertsEnabled": {
+          "description": "Dependabot alerts.\n\nReceive alerts of new vulnerabilities that affect your dependencies.",
+          "type": "boolean"
+        },
+        "automaticSecurityUpdatesEnabled": {
+          "description": "Dependabot security updates.\n\nEasily upgrade to non-vulnerable dependencies.\n\nEnabling these updates automatically enables Dependabot alerts.",
+          "type": "boolean"
+        }
+      }
+    },
+    "defaultBranchProtection": {
+      "description": "Default branch protection rules",
+      "$ref": "#/definitions/BranchProtection"
+    },
+    "branchProtection": {
+      "description": "Branch protection rules",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/BranchProtection"
+      }
     },
     "homePage": {
       "deprecationMessage": "There is no API for this yet",
       "description": "There is no API for this yet!\n\nRepository homepage settings.",
       "x-intellij-html-description": "Repository homepage settings.",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "releasesDisplayed": {
           "description": "Display releases on homepage",
@@ -132,9 +160,31 @@
           "description": "Display environments on homepage",
           "type": "boolean"
         }
-      },
-      "additionalProperties": false
+      }
     }
   },
-  "additionalProperties": false
+  "definitions": {
+    "BranchProtection": {
+      "description": "Branch protection rules",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "administratorsIncluded": {
+          "description": "Include administrators.\n\nEnforce all configured restrictions for administrators.",
+          "x-intellij-html-description": "Include administrators.<p>Enforce all configured restrictions for administrators.",
+          "type": "boolean"
+        },
+        "forcePushesAllowed": {
+          "description": "Allow force pushes.\n\nPermit force pushes for all users with push access.",
+          "x-intellij-html-description": "Allow force pushes.<p>Permit force pushes for all users with push access.",
+          "type": "boolean"
+        },
+        "deletionsAllowed": {
+          "description": "Allow deletions.\n\nAllow users with push access to delete matching branches.",
+          "x-intellij-html-description": "Allow deletions.<p>Allow users with push access to delete matching branches.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
 }

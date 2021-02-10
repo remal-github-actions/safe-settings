@@ -5,4 +5,15 @@
   "git-submodules": {
     enabled: false, // This is in beta for now, so let's use Dependabot to update Git submodules
   },
+
+  js: {
+    packageRules: [
+      {
+        packageNames: ["yargs-parser"], // transitive dependency
+        major: {
+          enabled: false,
+        },
+      },
+    ],
+  },
 }
